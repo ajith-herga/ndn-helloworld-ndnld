@@ -25,7 +25,7 @@ static void daemonize(void)
 }
 
 
-JNIEXPORT jstring JNICALL Java_com_testndk_HelloWorld_Call_Ndn_Daemon (JNIEnv * env, jobject jObj)
+JNIEXPORT jstring JNICALL Java_com_testndk_HelloWorld_CallNdnDaemon (JNIEnv * env, jobject jObj)
 {
 	daemonize();
 	CapsH_drop();

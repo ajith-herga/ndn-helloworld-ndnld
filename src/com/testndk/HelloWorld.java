@@ -17,7 +17,18 @@ import android.widget.TextView;
  * 
  * @see SystemUiHider
  */
-public class HelloWorld extends Activity {
+
+/*class NdnThread  {
+	
+	public NdnThread(HelloWorld hello) {
+		// TODO Auto-generated constructor stub
+		new Thread(hello).start();	
+	}
+	
+    	
+}*/
+
+public class HelloWorld extends Activity implements Runnable{
 	/**
 	 * Whether or not the system UI should be auto-hidden after
 	 * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -45,13 +56,17 @@ public class HelloWorld extends Activity {
 	 * The instance of the {@link SystemUiHider} for this activity.
 	 */
 	private SystemUiHider mSystemUiHider;
-
+	
 	TextView txtHello;
 
 	static
 	{
 		System.loadLibrary("controller");
 		System.loadLibrary("HelloWorld");
+	}
+	
+	public void run () {
+		CallNdnDaemon();	
 	}
 	
 	@Override
@@ -66,7 +81,8 @@ public class HelloWorld extends Activity {
 		//setContentView(R.layout.main);
 		txtHello=(TextView)findViewById(R.id.fullscreen_content);
 		txtHello.setText(messageFromNativeCode());
-		
+	    //
+		new Thread(this).start();	
 		// Set up an instance of SystemUiHider to control the system UI for
 		// this activity.
 		mSystemUiHider = SystemUiHider.getInstance(this, contentView,
@@ -134,7 +150,7 @@ public class HelloWorld extends Activity {
 	}
 
 	public native String messageFromNativeCode();
-	
+	public native String CallNdnDaemon();
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
