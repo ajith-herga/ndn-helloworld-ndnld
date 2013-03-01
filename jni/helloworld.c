@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "ndnld.h"
+#include <android/log.h>
 
 static void daemonize(void)
 {
@@ -27,12 +28,26 @@ static void daemonize(void)
 
 JNIEXPORT jstring JNICALL Java_com_testndk_HelloWorld_CallNdnDaemon (JNIEnv * env, jobject jObj)
 {
-	daemonize();
+
+    __android_log_write(ANDROID_LOG_ERROR, "NDN", "Starting");
 	CapsH_drop();
 	PollMgr pm = PollMgr_ctor(50);
 	CcnCC cc = CcnCC_ctor();
+    if (!cc) {
+        __android_log_write(ANDROID_LOG_ERROR, "NDN", "cc NULL");
+        goto end;
+    }
+    if (!pm) {
+        __android_log_write(ANDROID_LOG_ERROR, "NDN", "pm NULL");
+        goto end;
+    }
 	CcnCC_pollAttach(cc, pm);
 	ConnMgr cmgr = ConnMgr_ctor(pm, cc);
+
+    if (!cmgr) {
+        __android_log_write(ANDROID_LOG_ERROR, "NDN", "cmgr NULL");
+        goto end;
+    }
 
 	while (true) {
 		PollMgr_poll(pm);
@@ -43,7 +58,7 @@ JNIEXPORT jstring JNICALL Java_com_testndk_HelloWorld_CallNdnDaemon (JNIEnv * en
 	CcnCC_pollDetach(cc, pm);
 	CcnCC_dtor(cc);
 	PollMgr_dtor(pm);
-
+end:
 	return (*env)->NewStringUTF(env, "OK");
 }
 

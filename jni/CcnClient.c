@@ -6,6 +6,7 @@
 #include <ccn/uri.h>
 #include <ccn/reg_mgmt.h>
 #include "ndnld.h"
+#include <android/log.h>
 
 CcnbMsg CcnbMsg_ctor(size_t size) {
 	CcnbMsg self = (CcnbMsg)ccn_charbuf_create();
@@ -220,12 +221,20 @@ struct ccn_charbuf* CcnbOR_read(CcnbOR self) {
 }
 
 CcnCC CcnCC_ctor(void) {
-	CcnCC self = ALLOCSELF;
+    const char *s;
+    CcnCC self = ALLOCSELF;
 	self->ccnh = ccn_create();
 	int res = ccn_connect(self->ccnh, NULL);
+    s = getenv("CCN_LOCAL_TRANSPORT");
+    if (!s) {
+        __android_log_write(ANDROID_LOG_ERROR, "NDN", "NULL string");
+    } else {
+        __android_log_write(ANDROID_LOG_ERROR, "NDN %s", s);
+    }
 	if (res == -1) {
 		self->error = true;
 		CcnCC_dtor(self);
+        __android_log_write(ANDROID_LOG_ERROR, "NDN", "res -1");
 		return NULL;
 	}
 
@@ -233,6 +242,7 @@ CcnCC CcnCC_ctor(void) {
 	CcnCC_fetchCcndid(self);
 	if (self->error) {
 		CcnCC_dtor(self);
+        __android_log_write(ANDROID_LOG_ERROR, "NDN", "fetch");
 		return NULL;
 	}
 
